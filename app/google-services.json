@@ -1,0 +1,131 @@
+{
+  "project_info": {
+    "project_id": "karmapp-46707",
+    "project_number": "1078676137512",
+    "name": "KarmApp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078676137512:android:2bbdd8156080f568",
+        "client_id": "android:fs.ndt",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "fs.ndt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078676137512-sl3cmgda0iefvem9siupjo5pduc792ie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fs.ndt",
+            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078676137512:android:27d689d63f1b7a06",
+        "client_id": "android:com.google.samples.quickstart.signin",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.google.samples.quickstart.signin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078676137512-72debk0o9b9fve5omgcmeudbdeggkvmb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.google.samples.quickstart.signin",
+            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078676137512:android:80b456d72301b5a2",
+        "client_id": "android:fs.ndt.karmapp",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "fs.ndt.karmapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078676137512-2dq47djn67hdk9v4j05d7vipu7ub4jbh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fs.ndt.karmapp",
+            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
