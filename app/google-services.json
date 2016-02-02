@@ -16,12 +16,8 @@
       },
       "oauth_client": [
         {
-          "client_id": "1078676137512-sl3cmgda0iefvem9siupjo5pduc792ie.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "fs.ndt",
-            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
-          }
+          "client_id": "1078676137512-vevukmmmm5ul2hicpa8f6hon6ojt14o3.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],
@@ -38,7 +34,7 @@
           "other_platform_oauth_client": []
         },
         "google_signin_service": {
-          "status": 2
+          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -56,12 +52,8 @@
       },
       "oauth_client": [
         {
-          "client_id": "1078676137512-72debk0o9b9fve5omgcmeudbdeggkvmb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.google.samples.quickstart.signin",
-            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
-          }
+          "client_id": "1078676137512-vevukmmmm5ul2hicpa8f6hon6ojt14o3.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],
@@ -78,7 +70,7 @@
           "other_platform_oauth_client": []
         },
         "google_signin_service": {
-          "status": 2
+          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -96,12 +88,16 @@
       },
       "oauth_client": [
         {
-          "client_id": "1078676137512-2dq47djn67hdk9v4j05d7vipu7ub4jbh.apps.googleusercontent.com",
+          "client_id": "1078676137512-ee7bkpdcs8fs4lkudnbds7idjafe0t4i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "fs.ndt.karmapp",
-            "certificate_hash": "AF9025807F5FB8D32151B69C4D733412E85ECEDE"
+            "certificate_hash": "71C3119440CC3D5F8F7FC2A443E34D7D05E83CB9"
           }
+        },
+        {
+          "client_id": "1078676137512-vevukmmmm5ul2hicpa8f6hon6ojt14o3.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],

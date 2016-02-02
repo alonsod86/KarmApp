@@ -134,6 +134,7 @@ public class SignInActivity extends AppCompatActivity implements
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false, result);
+            // updateUI(true, result);
         }
     }
     // [END handleSignInResult]
@@ -205,8 +206,9 @@ public class SignInActivity extends AppCompatActivity implements
             boolean redirectLogout = getIntent().getBooleanExtra("logout", false);
             getIntent().removeExtra("logout");
             if (!redirectLogout) {
+                String email = result.getSignInAccount()!=null?result.getSignInAccount().getEmail():"login@futurespace.es";
                 // if user is already registered
-                REST.get("/registered?mail=" + result.getSignInAccount().getEmail(), null, new JsonHttpResponseHandler() {
+                REST.get("/registered?mail=" + email, null, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                         // 200 is registered. Go to Cards activity
