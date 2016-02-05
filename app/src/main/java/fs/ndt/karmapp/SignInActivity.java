@@ -229,6 +229,8 @@ public class SignInActivity extends AppCompatActivity implements
                         startActivity(intent);
                     }
                 });
+                Intent intent = new Intent(getApplicationContext(), CardsActivity.class);
+                startActivity(intent);
             }
         } else {
             mStatusTextView.setText(R.string.signed_out);

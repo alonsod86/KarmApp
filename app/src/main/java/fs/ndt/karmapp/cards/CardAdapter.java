@@ -8,18 +8,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 import fs.ndt.karmapp.R;
@@ -37,11 +43,23 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         // each data item is just a string in this case
         public TextView txtResume;
         public ImageView mapView;
+        public TextView txtTime;
+        public TextView txtWeather;
+        public TextView txtMin;
+        public TextView txtMax;
+        public SeekBar barEvents;
+        public SeekBar barParking;
+        public SeekBar barAlergies;
 
         public ViewHolder(View v) {
             super(v);
             txtResume = (TextView) v.findViewById(R.id.txtResume);
             mapView = (ImageView) v.findViewById(R.id.mapView);
+            txtTime = (TextView) v.findViewById(R.id.txtTime);
+            txtWeather = (TextView) v.findViewById(R.id.txtWeather);
+            barEvents = (SeekBar) v.findViewById(R.id.barEvents);
+            barParking = (SeekBar) v.findViewById(R.id.barParking);
+            barAlergies = (SeekBar) v.findViewById(R.id.barAlergies);
         }
     }
 
@@ -82,23 +100,32 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Date dateStart = new Date(mDataset.get(position).dTStart);
+        Date dateEnd = new Date(mDataset.get(position).dTend);
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         String name = mDataset.get(position).title;
         String location = mDataset.get(position).eventLocation;
-        String date = formatter.format(new Date(mDataset.get(position).dTStart));
+        String date = formatter.format(dateStart);
+
+        Calendar calStart = Calendar.getInstance();
+        calStart.setTime(dateStart);
+        Calendar calEnd = Calendar.getInstance();
+        calEnd.setTime(dateEnd);
 
         // fill the card
         holder.txtResume.setText(date + " - " + name);
+        holder.txtTime.setText("Desde las " + calStart.get(Calendar.HOUR_OF_DAY) + ":0" + calStart.get(Calendar.MINUTE)
+                + " hasta las " + calEnd.get(Calendar.HOUR_OF_DAY) + ":0" + calEnd.get(Calendar.MINUTE));
         location = location == null ? "Madrid" : location.replace(" ", "%20");
 
         // TODO: Transform parkings, etc into coordinates
-        String path = "/fetch?";
+        String path = "/events?";
         path = path.concat("date=" + mDataset.get(position).dTStart);
         path = path.concat("location=" + location);
         REST.get(path, null, new FetchHandler(location, holder));
 
-        // on card click, navigate to detail view
+        // on card click, navigate to detail viewcalEnd
         holder.mapView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,17 +135,6 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         });
     }
 
-    private void buildCard(String location, ViewHolder holder) {
-        String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+location+"&zoom=14&size=640x390&scale=2&maptype=roadmap";
-        imageUrl+="&markers=color:blue%7Clabel:S%7C40.431295,-3.691917";
-        imageUrl+="&key=AIzaSyDiiwz46tDsceV4AIrD0wm7sWLAhD2pK54";
-
-        // show The Image in a ImageView
-        new DownloadImageTask(holder.mapView)
-                .execute(imageUrl);
-
-        System.out.println(imageUrl);
-    }
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
@@ -152,6 +168,44 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         }
     }
 
+    private void buidMap(JSONArray events, JSONArray parkings, ViewHolder holder) throws JSONException {
+        String eventsStr = "&markers=color:red%7Clabel:E%7C";
+        boolean first = true;
+        for (int index = 0; index<events.length(); index++) {
+            try {
+                if (!first) {
+                    eventsStr += "|";
+                } else {
+                    first = false;
+                }
+                eventsStr += ((JSONObject) events.get(index)).getDouble("lat") + ","
+                        + ((JSONObject) events.get(index)).getDouble("lon");
+            } catch (Exception e){}
+        }
+        eventsStr+="&markers=color:blue%7Clabel:P%7C";
+        first = true;
+        for (int index = 0; index<parkings.length(); index++) {
+            try {
+                if (!first) {
+                    eventsStr += "|";
+                } else {
+                    first = false;
+                }
+                eventsStr += ((JSONObject) parkings.get(index)).getDouble("lat") + ","
+                        + ((JSONObject) parkings.get(index)).getDouble("lon");
+            } catch (Exception e){}
+        }
+        String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+"Madrid"+"&zoom=13&size=640x390&scale=2&maptype=roadmap";
+        imageUrl+=eventsStr;
+        imageUrl+="&key=AIzaSyDiiwz46tDsceV4AIrD0wm7sWLAhD2pK54";
+
+        // show The Image in a ImageView
+        new DownloadImageTask(holder.mapView)
+                .execute(imageUrl);
+
+        System.out.println(imageUrl);
+    }
+
     /**
      * Resolves the visualization of a CardView with the location provided
      */
@@ -166,13 +220,16 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            buildCard(location, holder);
+            try {
+                buidMap((JSONArray) response.get("events"),(JSONArray) response.get("parkings"), holder);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
-            buildCard(location, holder);
         }
     }
 }
