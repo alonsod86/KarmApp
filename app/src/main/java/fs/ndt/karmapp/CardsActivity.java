@@ -84,7 +84,13 @@ public class CardsActivity extends AppCompatActivity
 
         ArrayList<Event> events = new ArrayList<>();
         for (Calendar calendar : calendars) {
-            events.addAll(provider.getEvents(calendar.id).getList());
+            // TODO: por dios que acepten java 8 en Android ya......... TT_TT
+            List<Event> calendarEvents = provider.getEvents(calendar.id).getList();
+            for (Event calendarEvent : calendarEvents) {
+                if (calendarEvent.dTStart >= System.currentTimeMillis()) {
+                    events.add(calendarEvent);
+                }
+            }
         }
 
         return events;

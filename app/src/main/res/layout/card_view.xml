@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!-- A CardView that contains a TextView -->
@@ -9,7 +10,7 @@
         android:id="@+id/card_view"
         android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="370dp"
         card_view:cardCornerRadius="4dp"
         android:layout_marginLeft="3dp"
         android:layout_marginTop="3dp"
@@ -17,11 +18,20 @@
         card_view:cardUseCompatPadding="true"
         card_view:elevation="1dp">
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_warning_white_48dp"
+            android:clickable="false"
+            card_view:backgroundTint="#fe5f2a" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -51,7 +61,7 @@
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="150dp"
                 android:text="This is a short description"
                 android:textColor="#101010"
                 android:background="#f5f5f5"

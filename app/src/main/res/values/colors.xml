@@ -9,4 +9,10 @@
     <color name="blue_grey_700">#455A64</color>
     <color name="blue_grey_800">#37474F</color>
     <color name="blue_grey_900">#263238</color>
+
+    <!-- alerts -->
+    <color name="alert_ok">#24d586</color>
+    <color name="alert_warn">#fec92a</color>
+    <color name="alert_kaos">#fe5f2a</color>
+
 </resources>
