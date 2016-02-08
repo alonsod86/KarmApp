@@ -49,7 +49,7 @@
     <string name="contacts_permission_rationale">Contacts access is needed in order to retrieve your email address.</string>
 
     <!-- Activity Names and Descriptions -->
-    <string name="name_sign_in_activity">SignInActivity</string>
+    <string name="name_sign_in_activity">Log in</string>
     <string name="desc_sign_in_activity">Signing in, signing out, and revoking access.</string>
     <string name="desc_sign_in_activity_scopes">Signing in, signing out, and revoking access with Google Drive permissions.</string>
     <string name="name_id_token_activity">IdTokenActivity</string>
@@ -62,7 +62,7 @@
          from https://console.developers.google.com/ -->
     <string name="server_client_id">YOUR_SERVER_CLIENT_ID</string>
     <string name="q_parking">¿Quieres información sobre parkings?</string>
-    <string name="title_activity_cards">CardsActivity</string>
+    <string name="title_activity_cards">Calendario</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

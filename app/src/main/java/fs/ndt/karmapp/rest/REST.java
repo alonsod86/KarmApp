@@ -8,9 +8,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 
 import cz.msebera.android.httpclient.HttpEntity;
+import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
 import cz.msebera.android.httpclient.protocol.HTTP;
@@ -19,8 +22,9 @@ import cz.msebera.android.httpclient.protocol.HTTP;
  * Created by tiocansino on 29/1/16.
  */
 public class REST {
-    //private static final String BASE_URL = "http://localhost:8080/api";
-    private static final String BASE_URL = "http://karmapp.getsandbox.com";
+    //private static final String BASE_URL = "http://192.168.10.185:8080/api";
+    //private static final String BASE_URL = "http://karmapp.getsandbox.com";
+    private static final String BASE_URL = "http://192.168.10.208:8080/api";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -44,8 +48,9 @@ public class REST {
 //                params.put(key, body.get(key));
 //
 //            }
-            StringEntity entity = new StringEntity(body.toString());
+            StringEntity entity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
             entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            entity.setContentEncoding("UTF-8");
             client.post(null, getAbsoluteUrl(url), entity, "application/json", responseHandler);
         } catch (Exception e) {
             e.printStackTrace();

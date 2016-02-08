@@ -46,6 +46,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         // each data item is just a string in this case
         public TextView txtResume;
         public ImageView mapView;
+        public ImageView imgWeather;
         public TextView txtTime;
         public TextView txtWeather;
         public TextView txtMin;
@@ -61,6 +62,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
             txtMax = (TextView) v.findViewById(R.id.txtMax);
             txtMin = (TextView) v.findViewById(R.id.txtMin);
             mapView = (ImageView) v.findViewById(R.id.mapView);
+            imgWeather = (ImageView) v.findViewById(R.id.imgWeather);
             txtTime = (TextView) v.findViewById(R.id.txtTime);
             txtWeather = (TextView) v.findViewById(R.id.txtWeather);
             barEvents = (SeekBar) v.findViewById(R.id.barEvents);
@@ -97,7 +99,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     // Create new views (invoked by the layout manager)
     @Override
     public CardAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+                                                     int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view, parent, false);
         // set the view's size, margins, paddings and layout parameters
@@ -125,7 +127,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         holder.txtResume.setText(date + " - " + name);
         holder.txtTime.setText("Desde las " + calStart.get(Calendar.HOUR_OF_DAY) + ":0" + calStart.get(Calendar.MINUTE)
                 + " hasta las " + calEnd.get(Calendar.HOUR_OF_DAY) + ":0" + calEnd.get(Calendar.MINUTE));
-        location = location == null ? "Madrid" : location.replace(" ", "%20");
+        location = (location == null || location.isEmpty())? "Madrid" : location.replace("\n", "").replace("\t", "");
 
         // TODO: Transform parkings, etc into coordinates
         String path = "/event";
@@ -133,8 +135,8 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         try {
             body.put("date", "" + mDataset.get(position).dTStart);
             body.put("direccion", location);
-            body.put("id", "" + mDataset.get(position).id);
-            REST.post(path, body, new FetchHandler(location, holder));
+            body.put("userID", "" + mDataset.get(position).id);
+            REST.post(path, body, new FetchHandler(location.replace(" ", "%20"), holder));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -183,38 +185,65 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     }
 
     private void buildWeather(JSONObject weather, ViewHolder holder) throws JSONException {
-        holder.txtWeather.setText(weather.getString("forecast"));
-        holder.txtMax.setText("" + weather.getInt("max") + "º");
-        holder.txtMin.setText("" + weather.getInt("min") + "º");
-    }
-
-    private void buidThermometer(JSONObject thermometer, ViewHolder holder) throws JSONException {
-        holder.barParking.setProgress(thermometer.getInt("parkings"));
-        holder.barAlergies.setProgress(thermometer.getInt("alergies"));
-        holder.barEvents.setProgress(thermometer.getInt("events"));
-    }
-
-    private void buildAlert(int alert, ViewHolder holder) throws JSONException {
-        switch (alert) {
-            case 0: {
-                holder.fab.setImageResource(R.drawable.ic_thumb_up_white_48dp);
-                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_ok));
-                break;
+        try {
+            int wId = weather.getInt("forecastid");
+            switch (wId) {
+                case 0: {
+                    holder.imgWeather.setImageResource(R.drawable.weather);
+                    break;
+                }
+                case 1: {
+                    holder.imgWeather.setImageResource(R.drawable.cloudy);
+                    break;
+                }
+                case 2: {
+                    holder.imgWeather.setImageResource(R.drawable.rainny);
+                    break;
+                }
             }
-            case 1: {
-                holder.fab.setImageResource(R.drawable.ic_info_white_48dp);
-                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_warn));
-                break;
-            }
-            case 2: {
-                holder.fab.setImageResource(R.drawable.ic_warning_white_48dp);
-                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_kaos));
-                break;
-            }
+            holder.txtWeather.setText(weather.getString("forecast"));
+            holder.txtMax.setText("" + weather.getInt("max") + "º");
+            holder.txtMin.setText("" + weather.getInt("min") + "º");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void buidMap(JSONArray events, JSONArray parkings, ViewHolder holder) throws JSONException {
+    private void buidThermometer(JSONObject thermometer, ViewHolder holder) throws JSONException {
+        try {
+            holder.barParking.setProgress(thermometer.getInt("parkings"));
+            holder.barAlergies.setProgress(thermometer.getInt("alergies"));
+            holder.barEvents.setProgress(thermometer.getInt("events"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void buildAlert(int alert, ViewHolder holder) throws JSONException {
+        try {
+            switch (alert) {
+                case 0: {
+                    holder.fab.setImageResource(R.drawable.ic_thumb_up_white_48dp);
+                    holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_ok));
+                    break;
+                }
+                case 1: {
+                    holder.fab.setImageResource(R.drawable.ic_info_white_48dp);
+                    holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_warn));
+                    break;
+                }
+                case 2: {
+                    holder.fab.setImageResource(R.drawable.ic_warning_white_48dp);
+                    holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_kaos));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void buidMap(String location, boolean geocoded, JSONArray events, JSONArray parkings, JSONArray electricos, ViewHolder holder) throws JSONException {
         String eventsStr = "&markers=color:red%7Clabel:E%7C";
         boolean first = true;
         for (int index = 0; index<events.length(); index++) {
@@ -241,7 +270,20 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
                         + ((JSONObject) parkings.get(index)).getDouble("lon");
             } catch (Exception e){}
         }
-        String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+"Madrid"+"&zoom=13&size=640x390&scale=2&maptype=roadmap";
+        eventsStr+="&markers=color:green%7Clabel:E%7C";
+        first = true;
+        for (int index = 0; index<electricos.length(); index++) {
+            try {
+                if (!first) {
+                    eventsStr += "|";
+                } else {
+                    first = false;
+                }
+                eventsStr += ((JSONObject) electricos.get(index)).getDouble("lat") + ","
+                        + ((JSONObject) electricos.get(index)).getDouble("lon");
+            } catch (Exception e){}
+        }
+        String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+(geocoded?location:"Madrid")+"&zoom=13&size=640x390&scale=2&maptype=roadmap";
         imageUrl+=eventsStr;
         imageUrl+="&key=AIzaSyDiiwz46tDsceV4AIrD0wm7sWLAhD2pK54";
 
@@ -270,7 +312,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
                 buidThermometer((JSONObject) response.get("thermometer"), holder);
                 buildWeather((JSONObject) response.get("weather"), holder);
                 buildAlert(response.getInt("alert"), holder);
-                buidMap((JSONArray) response.get("events"),(JSONArray) response.get("parkings"), holder);
+                buidMap(this.location, response.getBoolean("geocoded"), (JSONArray) response.get("events"), (JSONArray) response.get("parkings"), (JSONArray) response.get("electricCharger"), holder);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -279,6 +321,16 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         @Override
         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
             super.onFailure(statusCode, headers, responseString, throwable);
+        }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+            super.onFailure(statusCode, headers, throwable, errorResponse);
+        }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+            super.onFailure(statusCode, headers, throwable, errorResponse);
         }
     }
 }
