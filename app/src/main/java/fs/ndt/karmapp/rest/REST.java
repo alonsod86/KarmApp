@@ -4,7 +4,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 
 import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -15,6 +19,7 @@ import cz.msebera.android.httpclient.protocol.HTTP;
  * Created by tiocansino on 29/1/16.
  */
 public class REST {
+    //private static final String BASE_URL = "http://localhost:8080/api";
     private static final String BASE_URL = "http://karmapp.getsandbox.com";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
@@ -30,8 +35,21 @@ public class REST {
         client.get(null, getAbsoluteUrl(url), se, "application/json", responseHandler);
     }
 
-    public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
+    public static void post(String url, JSONObject body, AsyncHttpResponseHandler responseHandler) {
+        RequestParams params = new RequestParams();
+        try {
+//            Iterator<String> itKeys = body.keys();
+//            while (itKeys.hasNext()) {
+//                String key = itKeys.next();
+//                params.put(key, body.get(key));
+//
+//            }
+            StringEntity entity = new StringEntity(body.toString());
+            entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            client.post(null, getAbsoluteUrl(url), entity, "application/json", responseHandler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {

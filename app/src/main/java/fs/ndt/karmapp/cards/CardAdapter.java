@@ -1,8 +1,10 @@
 package fs.ndt.karmapp.cards;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +37,7 @@ import me.everything.providers.android.calendar.Event;
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     private static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM '@' hh:mm");
     private ArrayList<Event> mDataset;
+    private Resources resources;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -50,16 +53,20 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         public SeekBar barEvents;
         public SeekBar barParking;
         public SeekBar barAlergies;
+        public FloatingActionButton fab;
 
         public ViewHolder(View v) {
             super(v);
             txtResume = (TextView) v.findViewById(R.id.txtResume);
+            txtMax = (TextView) v.findViewById(R.id.txtMax);
+            txtMin = (TextView) v.findViewById(R.id.txtMin);
             mapView = (ImageView) v.findViewById(R.id.mapView);
             txtTime = (TextView) v.findViewById(R.id.txtTime);
             txtWeather = (TextView) v.findViewById(R.id.txtWeather);
             barEvents = (SeekBar) v.findViewById(R.id.barEvents);
             barParking = (SeekBar) v.findViewById(R.id.barParking);
             barAlergies = (SeekBar) v.findViewById(R.id.barAlergies);
+            fab = (FloatingActionButton) v.findViewById(R.id.fab);
         }
     }
 
@@ -75,8 +82,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public CardAdapter(ArrayList<Event> myDataset) {
-        mDataset = myDataset;
+    public CardAdapter(ArrayList<Event> myDataset, Resources resources) {
+        this.mDataset = myDataset;
+        this.resources = resources;
         Comparator<Event> comparator = new Comparator<Event>() {
             public int compare(Event c1, Event c2) {
                 return new Long(c1.dTStart).compareTo(c2.dTStart);
@@ -120,10 +128,16 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         location = location == null ? "Madrid" : location.replace(" ", "%20");
 
         // TODO: Transform parkings, etc into coordinates
-        String path = "/events?";
-        path = path.concat("date=" + mDataset.get(position).dTStart);
-        path = path.concat("location=" + location);
-        REST.get(path, null, new FetchHandler(location, holder));
+        String path = "/event";
+        JSONObject body = new JSONObject();
+        try {
+            body.put("date", "" + mDataset.get(position).dTStart);
+            body.put("direccion", location);
+            body.put("id", "" + mDataset.get(position).id);
+            REST.post(path, body, new FetchHandler(location, holder));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         // on card click, navigate to detail viewcalEnd
         holder.mapView.setOnClickListener(new View.OnClickListener() {
@@ -165,6 +179,38 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
+        }
+    }
+
+    private void buildWeather(JSONObject weather, ViewHolder holder) throws JSONException {
+        holder.txtWeather.setText(weather.getString("forecast"));
+        holder.txtMax.setText("" + weather.getInt("max") + "º");
+        holder.txtMin.setText("" + weather.getInt("min") + "º");
+    }
+
+    private void buidThermometer(JSONObject thermometer, ViewHolder holder) throws JSONException {
+        holder.barParking.setProgress(thermometer.getInt("parkings"));
+        holder.barAlergies.setProgress(thermometer.getInt("alergies"));
+        holder.barEvents.setProgress(thermometer.getInt("events"));
+    }
+
+    private void buildAlert(int alert, ViewHolder holder) throws JSONException {
+        switch (alert) {
+            case 0: {
+                holder.fab.setImageResource(R.drawable.ic_thumb_up_white_48dp);
+                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_ok));
+                break;
+            }
+            case 1: {
+                holder.fab.setImageResource(R.drawable.ic_info_white_48dp);
+                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_warn));
+                break;
+            }
+            case 2: {
+                holder.fab.setImageResource(R.drawable.ic_warning_white_48dp);
+                holder.fab.setBackgroundTintList(resources.getColorStateList(R.color.alert_kaos));
+                break;
+            }
         }
     }
 
@@ -221,6 +267,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
+                buidThermometer((JSONObject) response.get("thermometer"), holder);
+                buildWeather((JSONObject) response.get("weather"), holder);
+                buildAlert(response.getInt("alert"), holder);
                 buidMap((JSONArray) response.get("events"),(JSONArray) response.get("parkings"), holder);
             } catch (JSONException e) {
                 e.printStackTrace();

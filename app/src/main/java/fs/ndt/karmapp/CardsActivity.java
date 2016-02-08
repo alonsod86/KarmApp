@@ -56,7 +56,7 @@ public class CardsActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new CardAdapter(loadAllEvents());
+        mAdapter = new CardAdapter(loadAllEvents(), getResources());
         mRecyclerView.setAdapter(mAdapter);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
